@@ -1,0 +1,35 @@
+digraph {
+
+	pipe1 [label="pipe()"]
+	pipe2 [label="pipe()"]
+	pipen [label="pipe()"]
+	dup1 [label="dup2()\n(entrée de stdin, sortie vers pipe[0]"]
+	dup2 [label="dup2()\n(entrée de pipe[1], sortie vers pipe[0]"]
+	dupn [label="dup2()\n(entrée de pipe[1], sortie vers stdout)"]
+	fork1 [label="fork()"]
+	fork2 [label="fork()"]
+	forkn [label="fork()"]
+	exec1 [label="exec()"]
+	exec2 [label="exec()"]
+	execn [label="exec()"]
+	wait [label="wait()"]
+
+	shell -> pipe1 [rank=1]
+	subgraph {
+		pipe1 -> fork1
+		fork1 -> pipe2 [label="parent"]
+		fork1 -> dup1 -> exec1 -> cmd1 [label="enfant"]
+	}
+	subgraph {
+		pipe2 -> fork2
+		fork2 -> pipen [label="parent"]
+		fork2 -> dup2 -> exec2 -> cmd2 [label="enfant"]
+	}
+	subgraph {
+		pipen -> forkn
+		forkn -> wait [label="parent"]
+		wait -> wait
+		forkn -> dupn -> execn -> cmdn [label="enfant"]
+	}
+
+}
